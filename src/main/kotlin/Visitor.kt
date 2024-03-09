@@ -1,27 +1,89 @@
-import kotlinx.coroutines.*
+import kotlinx.serialization.Transient
 
 class Visitor(
-    var name: String,
-    var login: String,
-    private var password: String,
-) {
-    private val activeOrders = mutableListOf<Order>()
-    private lateinit var menu : Menu
-    private lateinit var updater : Job
+    name: String,
+    login: String,
+    password: String,
+) : User(name, login, password) {
+    @Transient
+    private val activeOrders = mutableMapOf<Int, Order>()
 
-    fun initMenu(menu : Menu) = run { this.menu = menu }
+    @Transient
+    private var numberForOrder = 1
 
-    suspend fun makeOrder() {
-        val order = Order(menu)
+
+    private suspend fun makeOrder() {
+        val order = Order(menu, numberForOrder)
         menu.show()
-        order.create()
-        activeOrders.add(order)
+        order.create(::onPreparedOrder)
+        activeOrders[numberForOrder] = order
+        numberForOrder++
     }
 
-    private suspend fun update() = coroutineScope {
-        updater = launch {
-            while (true) {
-                activeOrders.removeIf { order -> !order.isActive() }
+     private fun onPreparedOrder(order: Order) {
+        payForOrder(order)
+        activeOrders.remove(order.number)
+    }
+
+     private fun showActiveOrders() {
+        activeOrders.values.forEach() { order ->
+            println("Number of order: ${order.number}")
+            order.show()
+            println()
+        }
+    }
+
+     private suspend fun deleteOrder() {
+         val number = readPositiveNumberOrNull()
+         if (number == null) {
+             println("Incorrect value")
+             return
+         }
+        if (activeOrders.containsKey(number)) {
+            activeOrders[number]!!.delete()
+            activeOrders.remove(number)
+        } else {
+            println("Order with this number doesn't exist. Probably it was already finished or deleted")
+        }
+    }
+
+     private fun changeOrder() {
+         val number = readPositiveNumberOrNull()
+         if (number == null) {
+             println("Incorrect value")
+             return
+         }
+        if (activeOrders.containsKey(number)) {
+            activeOrders[number]!!.change()
+        } else {
+            println("Order with this number doesn't exist. Probably it was already finished or deleted")
+        }
+    }
+
+    private fun payForOrder(order: Order) {
+        println("You payed ${order.cost}. Press Enter to continue")
+        readln()
+    }
+
+    override suspend fun work() {
+        while (true) {
+            println("""
+            Choose action:
+            - see menu
+            - make order
+            - show active orders
+            - delete order
+            - change order
+            - exit
+        """.trimIndent())
+            when (readln()) {
+                "see menu" -> showMenu()
+                "make order" -> makeOrder()
+                "show active orders" -> showActiveOrders()
+                "delete order" -> deleteOrder()
+                "change order" -> changeOrder()
+                "exit" -> return
+                else -> println("Incorrect input")
             }
         }
     }

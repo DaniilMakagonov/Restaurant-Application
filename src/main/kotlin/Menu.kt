@@ -3,7 +3,8 @@ import kotlinx.serialization.Serializable
 @Serializable
 class Menu(private val menu: MutableMap<Dish, Int>) {
 
-    private fun getDishOrNull(name: String): Dish? = menu.keys.find { dish -> dish.name == name }
+    fun getDish(name: String): Dish = menu.keys.find { dish -> dish.name == name }
+        ?: throw IllegalArgumentException("There is no position with this name in menu")
 
     fun addPosition(dish: Dish, amount: Int = 1) {
         if (!menu.containsKey(dish)) {
@@ -13,11 +14,9 @@ class Menu(private val menu: MutableMap<Dish, Int>) {
         }
     }
 
-    fun removePosition(dish: Dish) {
-        menu.remove(dish)
-    }
+    fun removePosition(dishName: String) = menu.remove(getDish(dishName))
 
-    private fun setAmount(dish: Dish, amount: Int) {
+    fun setAmount(dish: Dish, amount: Int) {
         if (!menu.containsKey(dish)) {
             throw IllegalArgumentException("There is no position with this name in menu")
         }
@@ -27,12 +26,14 @@ class Menu(private val menu: MutableMap<Dish, Int>) {
         menu[dish] = amount
     }
 
-    fun addToOrder(dishName : String) : Dish {
-        val dish = getDishOrNull(dishName) ?: throw IllegalArgumentException("There is no position with this name in menu")
+    fun addToOrder(dishName: String): Dish {
+        val dish = getDish(dishName)
         setAmount(dish, menu[dish] as Int - 1)
         return dish
     }
+
     fun show() {
         menu.forEach { (dish, amount) -> println("$dish, $amount") }
     }
+
 }
