@@ -26,7 +26,7 @@ class Visitor(
     }
 
      private fun showActiveOrders() {
-        activeOrders.values.forEach() { order ->
+        activeOrders.values.forEach { order ->
             println("Number of order: ${order.number}")
             order.show()
             println()
