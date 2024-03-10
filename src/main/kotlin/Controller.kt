@@ -9,16 +9,17 @@ import java.io.FileWriter
 class Controller {
     private val systemFilePath = "system.txt"
     private lateinit var system: System
+    private val json = Json {allowStructuredMapKeys = true}
 
     suspend fun start() {
         system = if (File(systemFilePath).exists()) {
-            Json.decodeFromString(withContext(Dispatchers.IO) {
+            json.decodeFromString(withContext(Dispatchers.IO) {
                 FileReader(systemFilePath).readText()
             })
         } else {
             System()
         }
-        system.work()
+        system.work(json)
     }
     fun exit() {
         FileWriter(systemFilePath).write(Json.encodeToString(system))

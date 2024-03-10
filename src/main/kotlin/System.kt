@@ -1,6 +1,7 @@
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.Transient
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import java.io.FileReader
@@ -8,6 +9,8 @@ import java.io.FileWriter
 
 @Serializable
 class System {
+    @Transient
+    private lateinit var json: Json
     private var income = 0
     private val menu = Menu(mutableMapOf())
 
@@ -25,12 +28,12 @@ class System {
             println("Incorrect login or password")
             return
         }
-        val user = Json.decodeFromString<User>(withContext(Dispatchers.IO) {
+        val user = json.decodeFromString<User>(withContext(Dispatchers.IO) {
             FileReader("$login.txt").readText()
         })
         user.work()
         withContext(Dispatchers.IO) {
-            FileWriter("$login.txt").write(Json.encodeToString(user))
+            FileWriter("$login.txt").write(json.encodeToString(user))
         }
     }
 
@@ -44,7 +47,7 @@ class System {
         }
         val user = if (type == "admin") Admin(login) { return@Admin income } else Visitor(login, ::onPayedOrder)
         user.initMenu(menu)
-        FileWriter("$login.txt").write(Json.encodeToString(user))
+        FileWriter("$login.txt").write(json.encodeToString(user))
         addUser(login, "$type.txt")
         println("Registration was successful. You may login")
     }
@@ -61,7 +64,8 @@ class System {
         return listOf(type, login)
     }
 
-    suspend fun work() {
+    suspend fun work(json: Json) {
+        this.json = json
         while (true) {
             println("""
                 Choose option:
