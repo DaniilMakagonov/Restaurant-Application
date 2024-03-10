@@ -21,7 +21,7 @@ class Controller {
             System()
         }
         println("Welcome!")
-        system.work(json)
+        system.work()
     }
 
     fun exit() {

@@ -1,13 +1,9 @@
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.Transient
-import kotlinx.serialization.json.Json
 import java.io.FileReader
 import java.io.File
 
 @Serializable
 class System {
-    @Transient
-    private lateinit var json: Json
     private var income = 0
     private val menu = Menu(mutableMapOf())
 
@@ -72,8 +68,7 @@ class System {
         return listOf(type, login)
     }
 
-    suspend fun work(json: Json) {
-        this.json = json
+    suspend fun work() {
         while (true) {
             println("""
                 Choose option:
