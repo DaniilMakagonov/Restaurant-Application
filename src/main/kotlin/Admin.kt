@@ -1,8 +1,7 @@
 class Admin(
-    name: String,
     login: String,
-    password: String,
-) : User(name, login, password) {
+    private val getIncome: () -> Int
+) : User(login) {
 
     private fun addDish() = menu.addPosition(readDish())
 
@@ -81,6 +80,7 @@ class Admin(
             - add dish
             - remove dish
             - change dish
+            - see actual income
             - exit
         """.trimIndent()
             )
@@ -89,6 +89,7 @@ class Admin(
                 "add dish" -> addDish()
                 "remove dish" -> removeDish()
                 "change dish" -> changeDish()
+                "see actual income" -> println(getIncome())
                 "exit" -> return
                 else -> println("Incorrect input")
             }

@@ -3,9 +3,7 @@ import kotlinx.serialization.Transient
 
 @Serializable
 abstract class User(
-    var name: String,
-    var login: String,
-    private var password: String,
+    val login: String
 ) {
     @Transient
     protected lateinit var menu: Menu

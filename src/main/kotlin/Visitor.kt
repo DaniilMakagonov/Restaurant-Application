@@ -1,10 +1,9 @@
 import kotlinx.serialization.Transient
 
 class Visitor(
-    name: String,
     login: String,
-    password: String,
-) : User(name, login, password) {
+    private val onPayedOrder: (Int) -> Unit
+) : User(login) {
     @Transient
     private val activeOrders = mutableMapOf<Int, Order>()
 
@@ -63,6 +62,7 @@ class Visitor(
     private fun payForOrder(order: Order) {
         println("You payed ${order.cost}. Press Enter to continue")
         readln()
+        onPayedOrder(order.cost)
     }
 
     override suspend fun work() {
