@@ -45,7 +45,7 @@ class System {
             println("User with this login already exist")
             return
         }
-        val user = if (type == "admin") Admin(login) { return@Admin income } else Visitor(login, ::onPayedOrder)
+        val user = if (type == "admin") Admin { return@Admin income } else Visitor(::onPayedOrder)
         user.initMenu(menu)
         FileWriter("$login.txt").write(json.encodeToString(user))
         addUser(login, "$type.txt")

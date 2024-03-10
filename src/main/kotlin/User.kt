@@ -2,9 +2,7 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 
 @Serializable
-abstract class User(
-    val login: String
-) {
+abstract class User {
     @Transient
     protected lateinit var menu: Menu
 
@@ -13,7 +11,7 @@ abstract class User(
 
     protected fun showMenu() = menu.show()
 
-    abstract suspend fun work();
+    abstract suspend fun work()
 
     protected fun readPositiveNumberOrNull() : Int? {
         var number = readln().toIntOrNull()

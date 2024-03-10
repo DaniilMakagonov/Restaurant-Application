@@ -1,7 +1,6 @@
 class Admin(
-    login: String,
     private val getIncome: () -> Int
-) : User(login) {
+) : User() {
 
     private fun addDish() = menu.addPosition(readDish())
 

@@ -1,9 +1,8 @@
 import kotlinx.serialization.Transient
 
 class Visitor(
-    login: String,
     private val onPayedOrder: (Int) -> Unit
-) : User(login) {
+) : User() {
     @Transient
     private val activeOrders = mutableMapOf<Int, Order>()
 
