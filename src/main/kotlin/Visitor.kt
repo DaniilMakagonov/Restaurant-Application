@@ -9,7 +9,7 @@ class Visitor : User() {
     private var numberForOrder = 1
 
 
-    private suspend fun makeOrder() : Order {
+    private fun makeOrder() : Order {
         val order = Order(menu, numberForOrder)
         menu.show()
         order.create(::onPreparedOrder)
