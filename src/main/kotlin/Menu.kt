@@ -7,17 +7,17 @@ class Menu(private val menu: MutableMap<Dish, Int>) {
         ?: throw IllegalArgumentException("There is no position with this name in menu")
 
     fun addPosition(dish: Dish, amount: Int = 1) {
-        if (!menu.containsKey(dish)) {
+        if (menu.filterKeys { it.name == dish.name }.isEmpty()) {
             menu[dish] = amount
         } else {
-            throw IllegalArgumentException("This dish is already in menu. Use \"Set amount\" to change the amount")
+            throw IllegalArgumentException("This dish is already in menu")
         }
     }
 
     fun removePosition(dishName: String) = menu.remove(getDish(dishName))
 
     fun setAmount(dish: Dish, amount: Int) {
-        if (!menu.containsKey(dish)) {
+        if (menu.filterKeys { it.name == dish.name }.isEmpty()) {
             throw IllegalArgumentException("There is no position with this name in menu")
         }
         if (amount < 0) {
@@ -33,6 +33,10 @@ class Menu(private val menu: MutableMap<Dish, Int>) {
     }
 
     fun show() {
+        if (menu.isEmpty()) {
+            println("Menu is empty")
+            return
+        }
         menu.forEach { (dish, amount) -> println("$dish, $amount") }
     }
 

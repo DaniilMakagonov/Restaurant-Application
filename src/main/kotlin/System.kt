@@ -5,7 +5,7 @@ import kotlinx.serialization.Transient
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import java.io.FileReader
-import java.io.FileWriter
+import java.io.File
 
 @Serializable
 class System {
@@ -14,26 +14,40 @@ class System {
     private var income = 0
     private val menu = Menu(mutableMapOf())
 
+    init {
+        val admin = File("admin.txt")
+        val visitor = File("visitor.txt")
+        if (!admin.exists()) {
+            admin.createNewFile()
+        }
+        if (!visitor.exists()) {
+            visitor.createNewFile()
+        }
+    }
+
     private fun addUser(login: String, fileName: String) =
-        FileWriter(fileName, true).write("$login\n")
+        File(fileName).appendText("$login\n")
 
     private fun isUserRegister (login: String, fileName: String) : Boolean =
-        FileReader(fileName).readLines().contains("$login\n")
+        FileReader(fileName).readLines().contains(login)
 
     private suspend fun loginUser() {
         val loginInfo = getLoginInfo()
         val type = loginInfo[0]
         val login = loginInfo[1]
         if (!isUserRegister(login, "$type.txt")) {
-            println("Incorrect login or password")
+            println("Incorrect login")
             return
         }
-        val user = json.decodeFromString<User>(withContext(Dispatchers.IO) {
-            FileReader("$login.txt").readText()
-        })
-        user.work()
-        withContext(Dispatchers.IO) {
-            FileWriter("$login.txt").write(json.encodeToString(user))
+
+        if (type == "admin") {
+            val admin = Admin()
+            admin.getIncomeInit { return@getIncomeInit income }
+            admin.work(menu)
+        } else {
+            val visitor = Visitor()
+            visitor.onPayedOrderInit(::onPayedOrder)
+            visitor.work(menu)
         }
     }
 
@@ -45,9 +59,6 @@ class System {
             println("User with this login already exist")
             return
         }
-        val user = if (type == "admin") Admin { return@Admin income } else Visitor(::onPayedOrder)
-        user.initMenu(menu)
-        FileWriter("$login.txt").write(json.encodeToString(user))
         addUser(login, "$type.txt")
         println("Registration was successful. You may login")
     }

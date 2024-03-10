@@ -5,20 +5,17 @@ class Order(private val menu: Menu, val number: Int) {
     private val dishes: MutableList<Dish> = mutableListOf()
     private var difficulty: Int = 0
     private lateinit var onPrepared: (Order)-> Unit
-    private lateinit var job: Job
+    lateinit var job: Job
     var cost = 0
         private set
 
-    suspend fun create(func: (Order) -> Unit) {
+    fun create(func: (Order) -> Unit) {
         onPrepared = func
         addDishes()
-        startPreparing()
     }
 
-    private suspend fun startPreparing() = coroutineScope {
-        job = launch {
-            delay(difficulty * 1000L)
-        }
+    suspend fun startPreparing() {
+        delay(difficulty * 100L)
         onPrepared(this@Order)
     }
 
@@ -30,9 +27,9 @@ class Order(private val menu: Menu, val number: Int) {
 
     private fun addDishes() {
         while (true) {
-            println("Choose available dishes from menu or input \"Exit\" for send it")
+            println("Choose available dishes from menu or input \"exit\" for send it")
             val command = readln()
-            if (command == "Exit") {
+            if (command == "exit") {
                 break
             }
             try {

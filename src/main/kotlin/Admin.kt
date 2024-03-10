@@ -1,12 +1,28 @@
-class Admin(
-    private val getIncome: () -> Int
-) : User() {
-
-    private fun addDish() = menu.addPosition(readDish())
+class Admin : User() {
+    private lateinit var getIncome: () -> Int
+    private fun addDish() {
+        val dish = readDish()
+        println("Input amount:")
+        var amount = readPositiveNumberOrNull()
+        while (amount == null) {
+            println("Incorrect value")
+            amount = readPositiveNumberOrNull()
+        }
+        try {
+            menu.addPosition(dish, amount)
+        } catch (e: IllegalArgumentException) {
+            println(e.message)
+        }
+    }
 
     private fun removeDish() {
         println("Input name")
-        menu.removePosition(readln())
+        try {
+            menu.removePosition(readln())
+        } catch (e: IllegalArgumentException) {
+            println(e.message)
+            return
+        }
     }
 
     private fun changeDish() {
@@ -70,7 +86,8 @@ class Admin(
         }
     }
 
-    override suspend fun work() {
+    override suspend fun work(menu: Menu) {
+        this.menu = menu
         while (true) {
             println(
                 """
@@ -112,4 +129,6 @@ class Admin(
         }
         return Dish(name, cost, difficulty)
     }
+
+    fun getIncomeInit(func: () -> Int) = run { getIncome = func }
 }

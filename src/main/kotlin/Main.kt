@@ -1,5 +1,11 @@
 suspend fun main() {
     val controller = Controller()
-    controller.start()
-    controller.exit()
+    try {
+        controller.start()
+    } catch(e: Exception) {
+        println(e.message)
+        println(e.stackTrace)
+    } finally {
+        controller.exit()
+    }
 }

@@ -1,19 +1,11 @@
-import kotlinx.serialization.Serializable
-import kotlinx.serialization.Transient
-
-@Serializable
-abstract class User {
-    @Transient
+sealed class User {
     protected lateinit var menu: Menu
-
-    fun initMenu(menu: Menu) = run { this.menu = menu }
-
 
     protected fun showMenu() = menu.show()
 
-    abstract suspend fun work()
+    abstract suspend fun work(menu: Menu)
 
-    protected fun readPositiveNumberOrNull() : Int? {
+    protected fun readPositiveNumberOrNull(): Int? {
         var number = readln().toIntOrNull()
         if (number != null && number <= 0) {
             number = null
